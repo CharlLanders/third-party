@@ -709,12 +709,35 @@ html.cbm .pdots span:nth-child(2) i::after,html.cbm .snames label:nth-child(2) i
 html.cbm .pdots span:nth-child(3) i::after,html.cbm .snames label:nth-child(3) i::after{clip-path:polygon(50% 6%,100% 92%,0 92%)}
 html.cbm .pdots span:nth-child(4) i::after,html.cbm .snames label:nth-child(4) i::after{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
 body[data-view=home] #stage,body[data-view=setup] #stage,body[data-view=home] #gr,body[data-view=setup] #gr{display:none!important}
-body[data-view=play] #gv,body[data-view=play] #new,body[data-view=play] #top #wb{display:none!important}
+body[data-view=play] #gv,body[data-view=play] #new,body[data-view=play] #top #wb,body[data-view=play] #tpill{display:none!important}
 body[data-view=play] #top{padding-right:56px}
 body[data-view=play] #gr{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:6px;left:auto;bottom:auto;width:auto;padding:0;background:none;border:none;box-shadow:none;z-index:12;display:flex}
 body[data-view=play] #st{order:2;position:sticky;top:calc(var(--hh,52px));z-index:6;background:var(--bg);padding:2px 8px 6px}
 body[data-view=play] #bd{order:3}
 body[data-view=play]{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)!important}
+@media (prefers-reduced-motion:no-preference){
+ .m,.d.n{animation-duration:.32s;animation-timing-function:cubic-bezier(.18,.9,.32,1.28)}
+ #st.cue{animation:turnIn .42s cubic-bezier(.2,.8,.2,1)}
+ #score span.on{animation:turnPop .4s cubic-bezier(.2,.8,.2,1)}
+}
+@keyframes turnIn{from{opacity:0;transform:translateY(7px)}}
+@keyframes turnPop{0%{transform:scale(.94)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+#rm{bottom:auto;top:auto;left:16px;right:16px;width:auto;transform:none;margin:0 auto;max-width:420px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);padding:22px 18px 16px}
+#rm .rt{font-size:26px;font-weight:800;margin:4px 0 6px}
+#rm .rw{margin:0 0 14px}
+#rm .rb{flex-direction:column}
+#rm .rb button{min-height:52px;font-size:17px}
+.lobby .lcode{font-size:clamp(36px,12vw,52px);font-weight:800;letter-spacing:.2em;text-align:center;margin:4px 0 2px}
+.lobby .qr{display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px 0 12px}
+.lobby .qr svg{width:min(200px,58vw);height:auto;background:#fff;border-radius:12px}
+.lobby .qr span{font-size:13px;color:var(--mut)}
+.lpr{display:flex;align-items:center;gap:10px;min-height:48px}
+.lpr i{width:14px;height:14px;border-radius:50%;flex:none;position:relative}
+.lpr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.lpr em{font-style:normal;color:var(--mut);font-size:13px}
+.tick{width:26px;height:26px;border-radius:50%;border:2px solid color-mix(in srgb,var(--ink) 35%,transparent);display:flex;align-items:center;justify-content:center;flex:none;color:transparent;font-weight:800}
+.tick.on{background:var(--p3);border-color:var(--p3);color:#fff}
+.tick svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;background:none}
 @media (orientation:landscape) and (max-height:540px){
  body[data-view=play] #gr{position:static;grid-area:g}
  body[data-view=play] #st{position:static}
@@ -757,7 +780,7 @@ document.documentElement.dataset.skin=['lavender','sage','sky','peach','candy','
 </div>
 </div>
 <div class="board" id="bd"></div>
-<div id="st"></div>
+<div id="st" role="status" aria-live="polite"></div>
 <div id="gbk" hidden></div><div id="gr"><div id="tn" role="status" aria-live="polite"></div><div id="wn" role="status" aria-live="polite"></div><div id="tt" role="status" aria-live="polite"></div><canvas id="cf" aria-hidden="true"></canvas><button id="thm" class="ic" type="button" aria-label="Change theme" title="Change theme"><i class="sw"></i></button><div class="dd" id="gv"><button id="gpick" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Game: Tic-tac-toe" title="Game"><span id="gpl"></span><span id="gnm">Tic-tac-toe</span></button>
     <ul id="gmenu" role="listbox" aria-label="Choose a game" hidden>
       <li role="presentation" class="ghd" aria-hidden="true"><i></i></li>
@@ -845,7 +868,7 @@ function showWin(txt,raw){if(replaying)return;const w=$('wn');clearTimeout(wt);c
 function ui(turn,txt,a,b,c,d){const raw=txt;$('st').dataset.raw=raw;if(typeof setRM=='function'&&!rm.hidden&&!/\bwins?$/.test(raw)&&!/^(Draw|Stalemate)/.test(raw)&&!/ tie$/.test(raw))setRM(false);
  {const sk=[a,b,c,d].join(','),quiet=performance.now()<sfxHold;
   if(uiFresh){uiFresh=false}else if(!/\bwins?$/.test(raw)&&!/^(Draw|Stalemate)/.test(raw)&&!/ tie$/.test(raw)&&!quiet){if(sk!=prevSk)snd('pop');else if(turn!==prevTurn)snd('tap')}
-  if(turn&&turn!==prevTurn&&prevTurn!==null){if(net){if(turn==net.me&&!net.solo){buzz([25,45,25]);setTimeout(()=>snd('turn'),180)}}else buzz(9)}
+  if(turn&&turn!==prevTurn&&prevTurn!==null){if(!replaying){const st=$('st');st.classList.remove('cue');void st.offsetWidth;st.classList.add('cue')}if(net){if(turn==net.me&&!net.solo){buzz([25,45,25]);setTimeout(()=>snd('turn'),180)}}else buzz(9)}
   prevTurn=turn;prevSk=sk}
  curT=turn;if(aiOn())txt=vsTxt(txt);else if(net)txt=meTxt(txt);const win=/\bwins?$/.test(txt);if(win&&!wasWin){addWin(winnerOf(raw));tourScore(winnerOf(raw));snd('win');buzz([40,60,40]);rematchSoon('win',txt,raw)}wasWin=win;
  const dr=!win&&(/^(Draw|Stalemate)/.test(raw)||/ tie$/.test(raw));if(dr){if(!wasDraw){tourScore(0);showDraw(txt,raw);rematchSoon('draw',txt,raw)}}else{$('wn').classList.remove('dr');showWin(win?txt:null,raw)}wasDraw=dr;$('s1').textContent=a;$('s2').textContent=b;
@@ -1373,13 +1396,15 @@ function hostSeats(){const pl=members().filter(m=>m.role=='play').sort((x,y)=>x.
 function hostRoster(){net.self.name=myName;const pl=hostSeats(),nm={},aw=[false,false,false,false,false];pl.forEach(m=>{nm[m.seat]=m.name;aw[m.seat]=!!m.away});
  const wt=members().filter(m=>!m.seat).map(m=>({n:m.name,a:!!m.away,h:m===net.self}));
  net.names=nm;net.me=net.self.seat;net.away=aw;net.watch=wt;net.hs=net.self.seat;net.nPlay=pl.length;net.solo=pl.length<=1;applyNames();
- net.list.forEach(p=>{if(p.conn&&p.conn.open)p.conn.send({t:'roster',names:nm,you:p.seat,away:aw,watch:wt,wi:members().filter(m=>!m.seat).indexOf(p),hs:net.hs,np:pl.length})});refreshOnline();if(typeof onRoom=='function')onRoom()}
+ const rdy={};pl.forEach(m=>{rdy[m.seat]=m.ready?1:0});
+ net.list.forEach(p=>{if(p.conn&&p.conn.open)p.conn.send({t:'roster',names:nm,you:p.seat,away:aw,watch:wt,wi:members().filter(m=>!m.seat).indexOf(p),hs:net.hs,np:pl.length,rdy})});net.ready=rdy;refreshOnline();if(typeof onRoom=='function')onRoom()}
 function hostStart(g,fresh){gid++;const m={t:'start',g,np:MP[g]?Math.max(2,hostSeats().length):2,seed:rnd32(),gid,fresh:fresh?1:0,tour:TOUR?JSON.parse(JSON.stringify(TOUR)):null};netSend(m);netApply(m)}
 function hostNew(){gid++;const m={t:'new',seed:rnd32(),gid};netSend(m);netApply(m)}
 function netReq(k,g){if(net.host){if(k=='pick')hostStart(g);else hostNew()}else toast('Only the host picks the game')}
 function hostRecv(p,d){if(!net||!d||typeof d!='object'||!net.list.includes(p))return;
  if(d.t=='mv'&&Array.isArray(d.a)){if(d.gid!=gid||!p.seat)return;if(hostGate){const out=hostGate(p.seat,d.a);if(!out||out.drop)return;d={t:'mv',a:out,gid:d.gid}}netSend(d,hostOrd?null:p);inq.push(d);pump()}
  else if(d.t=='name'){p.name=String(d.n||'').slice(0,12);hostRoster()}
+ else if(d.t=='ready'){p.ready=!!d.on;hostRoster()}
  else if(d.t=='bye'){p.bye=true;dropSeat(p)}}
 function dropSeat(p,msg){if(!net||!net.host)return;const i=net.list.indexOf(p);if(i<0)return;clearTimeout(p.awayT);const sat=!!p.seat;net.list.splice(i,1);hostRoster();if(sat)hostStart(cur,1);toast(msg||(p.name||'Someone')+' left')}
 /* host powers: who plays, the seat order, and removing someone */
@@ -1429,7 +1454,7 @@ function guestConnect(code,fail,ok){const reuse=net&&net.peer&&!net.peer.destroy
    if(d.t=='roster'){
     if(!net){if(ok)ok();offNp=np;offVs=vs;net={host:false,me:d.you,code,peer,conn,names:{}};olBusy=false;ss('tp-join',code);ss('tp-host',null)}
     else if(net.conn!==conn){const old=net.conn;net.conn=conn;net.peer=peer;if(old&&old!==conn)try{old.close()}catch(e){}if(rj){clearTimeout(rj.timer);rj=null;toast('Reconnected')}}
-    const was=net.me,first=!net.rs;net.rs=1;net.me=d.you|0;net.names=d.names||{};net.away=d.away||[];net.watch=d.watch||[];net.wi=d.wi??-1;net.hs=d.hs|0;net.nPlay=d.np|0;net.solo=net.nPlay<=1;applyNames();refreshOnline();if(typeof onRoom=='function')onRoom();
+    const was=net.me,first=!net.rs;net.rs=1;net.me=d.you|0;net.names=d.names||{};net.away=d.away||[];net.watch=d.watch||[];net.wi=d.wi??-1;net.hs=d.hs|0;net.nPlay=d.np|0;net.solo=net.nPlay<=1;net.ready=d.rdy||{};applyNames();refreshOnline();if(typeof onRoom=='function')onRoom();
     if(first&&!net.me&&olFill.role!='watch')toast('All 4 seats are taken, so you are watching');else if(!first&&was!=net.me)toast(net.me?'You are playing':'You are watching now');return}
    if(d.t=='sync'){if(net&&net.conn===conn)replaySync(d);return}
    if(d.t=='dgw'){if(net&&net.conn===conn&&typeof onSecret=='function')try{onSecret(d)}catch(e){}return}
@@ -1461,9 +1486,9 @@ function drawQR(box,url){const paint=()=>{try{const q=window.qrcode(0,'M');q.add
   for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+='M'+c+' '+r+'h1v1h-1z';
   box.innerHTML='<svg viewBox="-2 -2 '+(n+4)+' '+(n+4)+'" role="img" aria-label="QR code to join this game" shape-rendering="crispEdges"><rect x="-2" y="-2" width="'+(n+4)+'" height="'+(n+4)+'" fill="#fff"/><path d="'+d+'" fill="#111"/></svg><span>Friends nearby can scan this to join</span>'}catch(e){box.remove()}};
  if(window.qrcode){paint();return}const sc=document.createElement('script');sc.src=QRJS;sc.onload=paint;sc.onerror=()=>box.remove();document.head.appendChild(sc)}
-function shareLink(){const u=inviteURL();
- if(navigator.share)navigator.share({title:'Third Party',text:'Join my Third Party game. Code: '+net.code,url:u}).catch(()=>{});
- else if(navigator.clipboard)navigator.clipboard.writeText(u).then(()=>toast('Invite link copied'),()=>toast('Code: '+net.code));else toast('Code: '+net.code)}
+function shareLink(){const u=inviteURL(),data={title:'Third Party',text:'Join my Third Party game. Code: '+net.code,url:u};
+ const copy=()=>{if(navigator.clipboard)navigator.clipboard.writeText(u).then(()=>toast('Invite link copied'),()=>toast('Code: '+net.code));else toast('Code: '+net.code)};
+ if(navigator.share)navigator.share(data).catch(e=>{if(!e||e.name!=='AbortError')copy()});else copy()}
 function setMyName(v){myName=String(v).slice(0,12);try{localStorage.setItem('tc-me',myName)}catch(e){}
  if(net){if(net.host)hostRoster();else netSend({t:'name',n:myName})}}
 /* online panel */
@@ -1471,9 +1496,7 @@ const mkE=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className
 function refreshOnline(){if(!ol.hidden)olFill();syncOpp()}
 function olFill(){ol.innerHTML='';
  if(net){ol.appendChild(mkE('h3',null,net.host?'You are hosting':'You are online'));
-  ol.appendChild(mkE('p','nt','Game code'));ol.appendChild(mkE('div','code',net.code));
-  const qr=mkE('div','qr');ol.appendChild(qr);drawQR(qr,inviteURL());
-  const sb=mkE('button','wide pr','Share invite link');sb.type='button';sb.onclick=shareLink;ol.appendChild(sb);
+  const lobby=mkE('div','lobby');ol.appendChild(lobby);fillLobby(lobby);
   const ps=mkE('div','ps'),cnt=net.nPlay||0,H=net.host,mem=H?members():[];
   const ctl=(r,m)=>{if(!H||!m)return;const c=mkE('span','oc');
    const b=(txt,lab,fn,cls)=>{const x=mkE('button',cls||null,txt);x.type='button';x.setAttribute('aria-label',lab);x.onclick=e=>{e.stopPropagation();fn(x)};c.appendChild(x)};
@@ -1570,7 +1593,8 @@ function mRow(icon,label,fn,opts){const b=document.createElement('button');b.typ
 function mHead(t){const h=document.createElement('div');h.className='mh';h.textContent=t;mnu.appendChild(h)}
 function mmFill(){mnu.innerHTML='';
  mRow(mIcon('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>'),'New game',()=>{setMM(false);$('new').click()});
- mRow(mIcon(MI.hp),'Rules',()=>{setMM(false);setHelp(true)});
+ mRow(mIcon(MI.hp),'How to play',()=>{setMM(false);showTip(cur)});
+ if(TOUR)mRow(mIcon(MI.wn),'Tournament',()=>{setMM(false);tourCard(false)});
  mRow(mIcon('<path d="M15 5 8 12l7 7"/>'),'Back to home',()=>{setMM(false);goHome()});
  mRow(mIcon(MI.wn),'Wins',()=>{setMM(false);setWins(true)});
  mHead('Settings');
@@ -1951,9 +1975,8 @@ function rematchSoon(kind,txt,raw){if(replaying)return;clearTimeout(rmT);if(TOUR
  if(net&&!net.host){rm.appendChild(mkE('p','rw','Waiting for the host to pick what\'s next…'));setRM(true);return}
  const row=document.createElement('div');row.className='rb';
  const again=document.createElement('button');again.type='button';again.className='pr';again.textContent='Rematch';again.onclick=()=>{setRM(false);$('new').click()};
- const other=document.createElement('button');other.type='button';other.textContent='Pick another game';other.onclick=()=>{setRM(false);goHome()};
+ const other=document.createElement('button');other.type='button';other.textContent='New game';other.onclick=()=>{setRM(false);openSetup(cur)};
  row.appendChild(again);row.appendChild(other);rm.appendChild(row);setRM(true)},kind=='win'?1900:2300)}
-document.addEventListener('pointerdown',e=>{if(!rm.hidden&&!rm.contains(e.target))setRM(false)});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!rm.hidden)setRM(false)});
 /* Surprise me: a random game that suits how many people are playing */
 $('gsur').onclick=()=>{const people=net?Math.max(2,net.nPlay||1):(MP[cur]||np>2?np:2);
@@ -2016,13 +2039,15 @@ function trFill(){trp.innerHTML='';const pool=tourPool(),n=tourPeople();trPick=t
 /* First time a game is opened on this phone: a short card with the rules */
 const tpEl=$('tp');let tpT=0,seenTips=[];try{const v=JSON.parse(localStorage.getItem('tp-seen'));if(Array.isArray(v))seenTips=v}catch(e){}
 function setTip(o){tpEl.hidden=!o;if(!o)clearTimeout(tpT)}
-function tipSoon(g){clearTimeout(tpT);setTip(false);if(replaying||seenTips.includes(g))return;tpT=setTimeout(()=>{if(cur!=g||replaying)return;
- const h0=HELP[g];if(!h0)return;const h=typeof h0=='function'?h0():h0;seenTips.push(g);try{localStorage.setItem('tp-seen',JSON.stringify(seenTips))}catch(e){}
- tpEl.innerHTML='';const t=document.createElement('h3');t.textContent=h[0];tpEl.appendChild(t);
- h.slice(1,3).forEach(x=>{const p=document.createElement('p');p.textContent=x;tpEl.appendChild(p)});
+function showTip(g){const h0=HELP[g];if(!h0){setHelp(true);return}const h=typeof h0=='function'?h0():h0;
+ if(!seenTips.includes(g)){seenTips.push(g);try{localStorage.setItem('tp-seen',JSON.stringify(seenTips))}catch(e){}}
+ tpEl.innerHTML='';const t=document.createElement('h3');t.textContent='How to play';tpEl.appendChild(t);
+ const sub=document.createElement('p');sub.className='nt';sub.style.marginTop='0';sub.textContent=h[0];tpEl.appendChild(sub);
+ (h.slice(1,3).length?h.slice(1,3):['Open the full rules for the details.']).forEach(x=>{const p=document.createElement('p');p.textContent=x;tpEl.appendChild(p)});
  const row=document.createElement('div');row.className='rb';const ok=document.createElement('button');ok.type='button';ok.className='pr';ok.textContent='Got it';ok.onclick=()=>setTip(false);
- row.appendChild(ok);if(h.length>3){const more=document.createElement('button');more.type='button';more.textContent='All the rules';more.onclick=()=>{setTip(false);setHelp(true)};row.appendChild(more)}
- tpEl.appendChild(row);setTip(true)},450)}
+ row.appendChild(ok);const more=document.createElement('button');more.type='button';more.textContent='All the rules';more.onclick=()=>{setTip(false);setHelp(true)};row.appendChild(more);
+ tpEl.appendChild(row);setTip(true)}
+function tipSoon(g){clearTimeout(tpT);setTip(false);if(replaying||seenTips.includes(g))return;tpT=setTimeout(()=>{if(cur!=g||replaying)return;showTip(g)},450)}
 document.addEventListener('pointerdown',e=>{if(!tpEl.hidden&&!tpEl.contains(e.target))setTip(false)});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!tpEl.hidden)setTip(false)});
 /* Home, favourites, and the one setup step before a game. */
@@ -2053,13 +2078,27 @@ function renderHome(){const root=$('home');if(!root)return;if(!root.dataset.buil
  CAT_ORDER.forEach(t=>{if(t==='Favourites'||t==='Recently played')return;put(t,by[t]||[])});
  Object.keys(by).forEach(t=>{if(!CAT_ORDER.includes(t))put(t,by[t])})}
 function onRoom(){if(view==='setup')renderSetup()}
-function paintRoom(){const box=$('sroom');if(!box)return;box.innerHTML='';
- if(olBusy){box.appendChild(mkE('p','snote','Connecting…'));return}
- if(olErr)box.appendChild(mkE('p','snote',olErr));
- if(!net)return;
+const TICK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>';
+function seatReady(k){return !!(net&&net.ready&&(net.ready[k]||net.ready[String(k)]))}
+function setReady(on){if(!net||!net.me)return;if(net.host){net.self.ready=!!on;hostRoster();return}net.ready=Object.assign({},net.ready);net.ready[net.me]=on?1:0;netSend({t:'ready',on:on?1:0});if(view==='setup')paintRoom()}
+function fillLobby(box){box.classList.add('lobby');
  box.appendChild(mkE('p','snote',net.host?'Room code':'Joined'));
- box.appendChild(mkE('div','scode',net.code));
- const n=net.nPlay||1;box.appendChild(mkE('p','snote',n+(n===1?' person is':' people are')+' here. Up to 4 can play.'));
+ box.appendChild(mkE('div','lcode',net.code));
+ const qr=mkE('div','qr');box.appendChild(qr);drawQR(qr,inviteURL());
+ const share=mkE('button','sgo','Share');share.type='button';share.style.marginTop='0';share.onclick=shareLink;box.appendChild(share);
+ const n=net.nPlay||0;
+ for(let k=1;k<=n;k++){const row=mkE('div','lpr'),d=mkE('i');d.style.background='var(--p'+k+')';row.appendChild(d);
+  row.appendChild(mkE('span',null,N[k]||('Player '+k)));
+  const bits=[k==net.me?'You':'',k==net.hs?'Host':''].filter(Boolean);if(bits.length)row.appendChild(mkE('em',null,bits.join(' · ')));
+  const on=seatReady(k),tick=mkE('span','tick'+(on?' on':''));tick.innerHTML=TICK;tick.setAttribute('aria-label',on?'Ready':'Not ready yet');row.appendChild(tick);box.appendChild(row)}
+ if(!n)box.appendChild(mkE('p','snote','Waiting for players.'));
+ if(net.me){const on=seatReady(net.me),rb=mkE('button','swide',on?'Ready':'I’m ready');rb.type='button';rb.setAttribute('aria-pressed',on);rb.onclick=()=>setReady(!on);box.appendChild(rb)}
+ box.appendChild(mkE('p','snote','Tap ready when you can play. The host starts the game.'))}
+function paintRoom(){const box=$('sroom');if(!box)return;box.innerHTML='';
+ if(olBusy&&!net){box.appendChild(mkE('p','snote','Connecting…'));return}
+ if(olErr&&!net)box.appendChild(mkE('p','snote',olErr));
+ if(!net)return;
+ fillLobby(box);
  if(!net.host)box.appendChild(mkE('p','snote','Waiting for the host to start.'));
  const leave=mkE('button','swide','Leave room');leave.type='button';leave.onclick=()=>leaveOnline();box.appendChild(leave)}
 function renderSetup(){const root=$('setup');if(!root||!setupId)return;const g=gameList().find(x=>x.id===setupId);const name=g?g.name:setupId;root.innerHTML='';const sc=document.createElement('div');sc.className='ssc';root.appendChild(sc);
